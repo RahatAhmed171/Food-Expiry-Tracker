@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Up Food Tracker</title>
+    <link rel="icon" type="image/png" href="http://example.com/myicon.png">
+    <meta name="viewport" content="width=device-width">
+    <style>
+        *,
+        *::after,
+        *:before{
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        html{
+            font:normal 20px/1.5 sans-serif;
+        }
+        h1{
+            margin: 1rem 2rem;
+        }
+        form{
+            margin: 2rem;
+            width: 800px;
+        }
+        .form-box{
+            padding: 1rem;
+            clear: both;
+            width: 100%;
+            position: relative;
+        }
+        .form-box label{
+            font-size: 1rem;
+            float: left;
+            width: 100px;
+            margin-right: 20px;
+        }
+        .form-box input{
+            font-size: 1rem;
+            width: 300px;
+            padding: 0.25rem 1rem;
+        }
+        .form-box select{
+            font-size: 1rem;
+            width: 300px;
+            padding: 0.25rem 1rem;
+        }
+        .form-box option{
+            font-size: 1rem;
+            width: 300px;
+            padding: 0.25rem 1rem;
+        }
+        .form-box input[type="checkbox"]{
+            font-size: 1rem;
+        }
+        .form-box button{
+            font-size: 1rem;
+            border: none;
+            padding: 0.25rem 2rem;
+            margin-right: 1rem;
+            color: white;
+            background-color: cornflowerblue;
+            cursor: pointer;
+        }
+        
+        .error::after{
+            background-color: hsl(10, 60%, 50%);
+            color: papayawhip;
+            font-size: 1rem;
+            line-height: 1.8;
+            width: 350px;
+            padding-left: 1rem;
+            position:absolute;
+            right: 0;
+            content: attr(data-errormsg);
+        }
+    </style>
+</head>
+<body>
+    <h1>Sign up and start tracking your food</h1>
+    
+    <form id="form-user" action="#" method="post">
+        
+        <div class="form-box" data-errormsg="">
+            <label for="input-email">E-mail:</label>
+            <input type="email" id="input-email" required placeholder="E-mail Address" name="Email" tabindex="2" />
+        </div>
+        <div class="form-box" data-errormsg="">
+            <label for="input-first">Full Name:</label>
+            <input type="text" id="input-first" autofocus placeholder="Full Name" name="Fname" tabindex="1"/>
+        </div>
+        <div class="form-box" data-errormsg="">
+            <label for="input-password">Password:</label>
+            <input type="password" id="input-password" required placeholder="Password" name="Password" tabindex="2" />
+        </div>
+        <div class="form-box" data-errormsg="">
+            <label for="input-store">Store Name:</label>
+            <input type="text" id="input-store" autofocus placeholder="Store Name" name="Store" tabindex="1"/>
+        </div>
+      
+        <div class="form-box">
+            <button id="button-reset">Cancel</button>
+            <button id="button-register" type="submit">Register</button>
+        </div>
+    </form>
+    
+    <script>
+        const init = function(){
+    document.getElementById('button-reset').addEventListener('click', eset);
+    //document.getElementById('button-register').addEventListener('click', send);
+    document.getElementById('form-user').addEventListener('submit', send);
+}
+var fails=""
+
+const eset = function(ev){
+    //HTML will automatically put the form back to its initial state
+    //unless we do 
+    ev.preventDefault();
+    if (fails.length>0){
+        fails.forEach(function(obj){
+            let field = document.getElementById(obj.input);
+            field.parentElement.classList.remove('error');
+            field.parentElement.setAttribute('data-errormsg',"");
+        })
+
+    }
+    // programmatically we can reset it 
+    document.getElementById('form-user').reset();
+    //if you want to do anything else...
+}
+
+const send = function(ev){
+    
+    ev.preventDefault(); 
+    ev.stopPropagation();
+    //or the click will travel to the form and the form will submit
+    fails = validate();
+    //IF we wanted to do some async things then use a Promise with .then and .catch
+    if(fails.length === 0){
+        
+        let myForm = ev.target;
+        let fd = new FormData(myForm);
+        let url='http://127.0.0.1:1234/registerOperation'
+        let req=new Request(url,{
+            body: fd,
+            method: 'POST',
+     
+            })
+            fetch(req).then(function(response){
+            return response.json()
+            })
+            .then(function(json){
+                alert(`${json['message']}`)
+            })
+            .catch((err)=>{
+                alert("Sorry couldnt connect to server")
+            })
+
+        //good to go
+        //document.getElementById('form-user').submit();
+    }else{
+        //there are some errors to display
+        //bad user
+        //let err = document.querySelector('.error');
+        //let input = err.querySelector('input');
+        //err.setAttribute('data-errormsg', ` ... Missing ${input.placeholder}`);
+        fails.forEach(function(obj){
+            let field = document.getElementById(obj.input);
+            field.parentElement.classList.add('error');
+            field.parentElement.setAttribute('data-errormsg', obj.msg);
+        })
+    }
+}
+
+const validate = function(ev){
+    //let valid = true;
+    let failures = [];
+    //checkbox (or radio buttons grouped by name)
+    //let chk = document.getElementById('input-alive');
+    // .checked .value
+    /*
+    if(!chk.checked){
+        //valid = false;
+        //chk.parentElement.classList.add('error');
+        //chk.parentElement.setAttribute('data-errormsg', 'Must be alive to submit.');
+        failures.push({input: 'input-alive', msg: 'Must be alive to submit.'})
+    }
+    */
+
+    //select
+    //let select = document.getElementById('input-age');
+    // .selectedIndex  .options  .length   .selectedValue  .value
+    //if( select.selectedIndex === 0 ){
+      //  failures.push({input:'input-age', msg:'Too young'})
+    //}
+
+    //inputs for text, email, tel, color, number...
+    let first = document.getElementById('input-first');
+    let password = document.getElementById('input-password');
+    let email = document.getElementById('input-email');
+    let store=document.getElementById('input-store');
+    //.value, .defaultValue, length of value
+    if( first.value === ""){
+        failures.push({input:'input-first', msg:'Required Field'})
+    } 
+    if( password.value === "" || password.value.length < 8){
+        failures.push({input:'input-password', msg:'Must be at least 8 chars'})
+    } 
+    if( email.value === ""){
+        failures.push({input:'input-email', msg:'Required Field'})
+    }
+    if( store.value === ""){
+        failures.push({input:'input-store', msg:'Required Field'})
+    }
+    
+    //return a boolean || an object with details about the failures
+    return failures;
+}
+
+
+
+document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

@@ -1,0 +1,561 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <title>Food Tracker Home</title>
+    <link rel="icon" type="image/png" href="http://example.com/myicon.png">
+    <style>
+body {
+  padding: 0;
+  margin: 0;
+}
+header {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  text-align: center;
+  color:whitesmoke;
+  font-size: larger;
+  position: fixed;
+
+  top: 0;
+  width: 100%;
+  background-color: gray;
+  height: 50px;
+}
+footer {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    text-align: center;
+  color:whitesmoke;
+  font-size: larger;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: gray;
+  height: 50px;
+}
+main {
+  /* header and footer padding */
+  padding-top: 60px;
+  padding-bottom: 60px;
+}
+main>h1{
+    text-align: center;
+}
+.padding {
+  padding-bottom: 100%;
+}
+.a_row{
+  width: 50%;
+  height: 95px;
+  background-color: navy;
+
+}
+.product_name{
+  float: left;
+  text-align: center;
+  color: whitesmoke;
+  padding-left: 5px;
+  
+}
+.expiry_date{
+  float: right;
+  text-align: center;
+  color: whitesmoke;
+  padding-right: 5px;
+}
+
+
+.model{
+                background-color: rgba(0, 0,0, 0.7);
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                top: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                display: none;
+            }
+            .model-content{
+                width: 700px;
+                height: 600px;
+                background-color:white;
+                opacity: 1;
+                position:relative;
+                
+            }
+            form{
+            margin: 2rem;
+            width: 800px;
+        }
+        .form-box{
+            padding: 1rem;
+            clear: both;
+            width: 100%;
+            position: relative;
+        }
+        .form-box label{
+            font-size: 1rem;
+            float: left;
+            width: 100px;
+            margin-right: 20px;
+        }
+        .form-box input{
+            font-size: 1rem;
+            width: 300px;
+            padding: 0.25rem 1rem;
+        }
+        .form-box select{
+            font-size: 1rem;
+            width: 300px;
+            padding: 0.25rem 1rem;
+        }
+        .form-box option{
+            font-size: 1rem;
+            width: 300px;
+            padding: 0.25rem 1rem;
+        }
+        .form-box input[type="checkbox"]{
+            font-size: 1rem;
+        }
+        .form-box button{
+            font-size: 1rem;
+            border: none;
+            padding: 0.25rem 2rem;
+            margin-right: 1rem;
+            color: white;
+            background-color: cornflowerblue;
+            cursor: pointer;
+        }
+        .create_product_btn{
+          font-size: 1rem;
+            border: none;
+            padding: 0.25rem 2rem;
+            margin-right: 1rem;
+            color: white;
+            background-color: cornflowerblue;
+            cursor: pointer;
+        }
+        .logout{
+          font-size: 1rem;
+            border: none;
+            padding: 0.25rem 2rem;
+            margin-right: 1rem;
+            color: white;
+            background-color: cornflowerblue;
+            cursor: pointer;
+        }
+        
+        h1{
+            text-align: center;
+        }
+        .close{
+            position: absolute;
+            top: 0;
+            font-size: 42px;
+            right: 14px;
+            transform: rotate(45deg);
+            cursor: pointer;
+        }
+ 
+    </style>
+  </head>
+  <body onload="myFunction()">
+    <header> Food Expiry Tracker </header>
+    <main id="container">
+    <h1 id="store_nme"></h1>
+    <h3>Here is the list of all kinds of foods of your store along with their expiry dates . You will be emailed when your food is about to get expired </h2>
+    
+    <button id='create_product' class="create_product_btn">add product</button> 
+    <br>
+    <br>
+    <button id='logout_btn' class="logout">Logout</button> 
+    <br>
+    <br>
+    </main>
+    
+    <div class="model">
+      <div class="model-content">
+          <div class="close">+</div>
+          <h1>Product Info</h1>
+          <form id="form-user" action="#" method="post">
+              <div class="form-box" data-errormsg="">
+                  <label for="input-pname">Product Name</label>
+                  <input type="text" id="input-pname" autofocus placeholder="Product Name" name="pname" readonly tabindex="1"/>
+              </div>
+             
+              <div class="form-box" data-errormsg="">
+                  <label for="input-ptype">Product Type</label>
+                  <input type="text" id="input-ptype" required placeholder="Product Type" name="ptype" readonly tabindex="2" />
+              </div>
+              <div class="form-box" data-errormsg="">
+                <label for="input-pdate">Product Expiry Date</label>
+                <input type="date" id="input-pdate" required placeholder="Product Expiry Date" name="pdate"  readonly tabindex="2" />
+            </div>
+              <div class="form-box">
+                  <button id="button-edit">Edit</button>
+                  <button id="button-del">Delete</button>
+                  <button id="button-save">Save</button>
+                  <button id="button-add">add</button>
+              </div>
+          </form>
+      </div>
+  </div>
+    <footer> Design taken from codepen.io</footer>
+    <script>
+       let captured_product_name=''
+       async function myFunction(){
+          let store_name_in_str=''
+          let all_products_in_str=''
+            let get_products_url='http://127.0.0.1:1234/display_products'
+            let get_store_url='http://127.0.0.1:1234/storeName'
+            let the_token=localStorage.getItem('token')
+            let fd=new FormData()    
+            fd.append('mytoken',the_token)
+            let product_req=new Request(get_products_url,{
+                body: fd,
+                method: 'POST',
+         
+                })
+                let store_req=new Request(get_store_url,{
+                body: fd,
+                method: 'POST',
+         
+                })
+              
+          const fetchreq1=fetch(store_req)
+          .then((res)=>res.json())
+          const fetchreq2=fetch(product_req)
+          .then((res)=>res.json())
+                
+          Promise.all([fetchreq1,fetchreq2])
+          .then((res)=>{
+            [store_name_in_str,all_products_in_str]=res
+          
+          if(store_name_in_str['message']=='StoreName fetch successful')
+         {
+          if(all_products_in_str['message']=='Product fetch successful'){
+            var store_name= document.getElementById('store_nme')
+            var container=document.getElementById('container')
+            store_name.innerText=store_name_in_str['store'][0]['store']
+           
+            let all_products_in_arr=all_products_in_str['allproducts']
+      
+
+            for(let i=0;i<all_products_in_arr.length;i++){
+            var a_row=document.createElement("div");
+            var space=document.createElement("br");
+            var product_name=document.createElement("p");
+            var expiry_date=document.createElement("p");
+           
+           let my=new Date(all_products_in_arr[i]['product_exp_date'])
+           let the_dt=my.toLocaleDateString()
+            product_name.innerText=all_products_in_arr[i]['product_name']
+            a_row.className='a_row'
+            product_name.className='product_name'
+            expiry_date.innerText=the_dt
+           
+        
+            expiry_date.className='expiry_date'
+
+            container.appendChild(space)
+            container.appendChild(a_row);
+            a_row.appendChild(product_name)
+            a_row.appendChild(expiry_date)
+            
+
+   
+ }
+
+
+ 
+          }
+          else{
+            error_type[all_products_in_str['message']]
+          }
+         }
+         else{
+          
+           let the_func=error_type[all_products_in_str['message']]
+           the_func()
+         }
+          })
+        
+
+        
+    
+                
+        }
+        
+        const error_type={
+          "Failed to do the operation due to internal error":function(){
+            alert("Failed to do the operation due to internal error")
+          },
+          "Error 403 Forbidden. You need to login to view this page":function(){
+            alert('Sorry you need to login to view this page')
+            location.replace('http://127.0.0.1:1234/login')
+          }
+        }
+      
+        let edit_btn=document.getElementById("button-edit")
+        let del_btn=document.getElementById('button-del')
+        let expiry_date_box=document.getElementById("input-pdate")
+        let product_name_box=document.getElementById("input-pname")
+        let product_type_box=document.getElementById('input-ptype')
+        let save_btn=document.getElementById("button-save")
+        let add_btn=document.getElementById('create_product')
+        let add_submit_btn=document.getElementById('button-add')
+        let logout_btn=document.getElementById('logout_btn')
+        
+        var edit_state=false
+
+
+
+  document.addEventListener('click', async function(e){
+  if(e.target.className=='product_name'){
+    let the_product=e.target.innerText
+    let the_token=localStorage.getItem('token')
+    let get_a_product_url='http://127.0.0.1:1234/display_a_product'
+    let fd=new FormData()  
+
+    fd.append('mytoken',the_token)
+    fd.append('product_name',the_product)
+    let get_a_product_req=new Request(get_a_product_url,{
+      body: fd,
+      method: 'POST',
+         })
+    
+    
+    let response=await fetch(get_a_product_req)
+    let product_info=await response.json()
+   
+    if(product_info['message']=="Product fetch successful"){
+
+      document.querySelector(".model").style.display='flex'
+    save_btn.style.display='none'
+    add_submit_btn.style.display='none'
+    
+    document.getElementById("input-pname").value=product_info['productinfo'][0]['product_name']
+    document.getElementById("input-ptype").value=product_info['productinfo'][0]['product_type']
+    let date_in_datetime_obj=new Date(product_info['productinfo'][0]['product_exp_date'])
+    let result=dateobject_to_datestring(date_in_datetime_obj)
+    expiry_date_box.value=result
+    expiry_date_box.max='2022-12-31'
+    }
+    else{
+      let the_func=error_type[product_info['message']]
+      the_func()
+    }
+   
+    
+    
+
+    
+  }
+})
+let cls_btn=document.querySelector('.close')
+    
+    cls_btn.addEventListener('click',function(){
+        document.getElementById("form-user").reset()
+        closing_action()
+        
+        
+    })
+
+function closing_action(){
+  document.querySelector(".model").style.display='none'
+  edit_btn.style.display='inline-block'
+  save_btn.style.display='inline-block'
+  add_submit_btn.style.display='inline-block'
+  del_btn.style.display='inline-block'
+  product_name_box.readOnly=true
+  product_type_box.readOnly=true
+  expiry_date_box.readOnly=true
+
+
+        if(edit_state==true){
+          
+          edit_btn.disabled=false
+          
+          edit_state=false
+
+
+        }
+}
+function dateobject_to_datestring(date_in_obj){
+  const result = date_in_obj.toLocaleDateString("en-GB", { // you can use undefined as first argument
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+}).split('/').reverse().join('-')
+return result
+}
+edit_btn.addEventListener('click',function(event){
+  event.preventDefault()
+  event.stopPropagation()
+  document.getElementById("input-pdate").readOnly=false
+  edit_btn.disabled=true
+
+  del_btn.style.display='none'
+  save_btn.style.display='inline-block'
+  edit_state=true
+  
+  
+})
+save_btn.addEventListener('click',async function(event){
+  event.preventDefault()
+  event.stopPropagation()
+  
+  if (expiry_date_box.value==""){
+        alert("Date cant be empty")
+        return
+        }
+  else{
+    let the_token=localStorage.getItem('token')
+    let update_a_product_url='http://127.0.0.1:1234/update_a_product'
+    let updated_date=new Date(expiry_date_box.value)
+    let fd=new FormData()  
+
+    fd.append('mytoken',the_token)
+    fd.append('product_name',product_name_box.value)
+    fd.append('expiration_date',updated_date)
+
+    let update_a_product_req=new Request(update_a_product_url,{
+      body: fd,
+      method: 'POST',
+         })
+    closing_action()
+    
+    let response=await fetch(update_a_product_req)
+    let update_info=await response.json()
+    if(update_info['message']=="Product updated successfully"){
+      document.getElementById("form-user").reset()
+      alert('Product updated successfully')
+    }
+    else{
+      document.getElementById("form-user").reset()
+      let the_func=error_type[update_info['message']]
+      the_func()
+    }
+  
+ 
+
+  }
+})
+add_btn.addEventListener('click',function(event){
+  event.preventDefault()
+  event.stopPropagation()
+  document.querySelector(".model").style.display='flex'
+  product_name_box.readOnly=false
+  product_type_box.readOnly=false
+  expiry_date_box.readOnly=false
+  del_btn.style.display='none'
+  edit_btn.style.display='none'
+  save_btn.style.display='none'
+  
+
+
+})
+add_submit_btn.addEventListener('click',async function(event){
+  event.preventDefault()
+  event.stopPropagation()
+  if (product_name_box.value==""){
+        alert("Name cant be empty")
+        return
+        }
+  else if(product_type_box.value==""){
+    alert("Product type cant be empty")
+        return
+  }
+  else if(expiry_date_box.value==""){
+    alert("Date type cant be empty")
+        return
+  }
+  else{
+    let the_token=localStorage.getItem('token')
+    let add_a_product_url='http://127.0.0.1:1234/add_a_product'
+    let updated_date=new Date(expiry_date_box.value)
+   
+    let fd=new FormData()
+    fd.append('mytoken',the_token)
+    fd.append('product_name',product_name_box.value)
+    fd.append('product_type',product_type_box.value)
+    fd.append('expiration_date',updated_date)
+
+    let add_a_product_req=new Request(add_a_product_url,{
+      body: fd,
+      method: 'POST',
+         })
+    
+    document.getElementById("form-user").reset()
+    closing_action()
+    
+    let response=await fetch(add_a_product_req)
+    let insert_info=await response.json()
+    if(insert_info['message']=="Product inserted successfully"){
+      alert('Product inserted successfully')
+    }
+    else if(insert_info['message']=="Product with that name already exists"){
+      alert("Product with that name already exists")
+    }
+    else{
+      let the_func=error_type[insert_info['message']]
+      the_func()
+
+    }
+  
+ 
+
+    
+  }
+
+})
+del_btn.addEventListener('click',async function(event){
+  event.preventDefault()
+  event.stopPropagation()
+  let the_token=localStorage.getItem('token')
+  let delete_a_product_url='http://127.0.0.1:1234/delete_a_product'
+  let fd=new FormData()
+  fd.append('mytoken',the_token)
+  fd.append('product_name',product_name_box.value)
+
+  let delete_a_product_req=new Request(delete_a_product_url,{
+      body: fd,
+      method: 'POST',
+         })
+  
+  closing_action()
+
+  let response=await fetch(delete_a_product_req)
+  let delete_info=await response.json()
+  if(delete_info['message']=="Product deleted successfully"){
+    
+    alert("Product deleted successfully")
+  }
+  else{
+    let the_func=error_type[delete_info['message']]
+      the_func()
+  }
+
+
+
+
+  
+
+
+
+})
+logout_btn.addEventListener('click',function(event){
+  event.preventDefault()
+  event.stopPropagation()
+  localStorage.removeItem('token')
+  location.replace('http://127.0.0.1:1234/login')
+
+})
+
+      
+        
+        
+    </script>
+  </body>
+</html>
