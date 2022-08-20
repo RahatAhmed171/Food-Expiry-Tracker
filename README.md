@@ -42,6 +42,7 @@ ___
 ## **Project design:**
 
 ### 1) Use Case Diagram:
+![Food-Tracker-Use-case-diagram-Lucidchart](https://user-images.githubusercontent.com/69518859/185755511-34a3c682-adac-4a6f-90b8-2b62c6033c68.png)
 
 This app is mainly divided into two parts. 
 * Authentication and authorization
@@ -53,10 +54,12 @@ At a fixed schedule, the server independently checks for expired products and se
 
 
 ### 2 ) DB design:
+![Food-Tracker-ER-diagram-Lucidchart](https://user-images.githubusercontent.com/69518859/185755520-b6fc1142-ab78-4a8c-9399-95b1fbfe5c0e.png)
 
 One user can have atleast one to many products. All the columns of  `User` and `Product` table are `NOTNULL`.
 
 ### 3 ) Class Diagram:
+![Food-Tracker-Class-Diagram-Lucidchart](https://user-images.githubusercontent.com/69518859/185755532-0a432091-eb12-4834-960d-046d12963d02.png)
 
 Here `Notifier` is an abstract class that imitates the properties of Observer Pattern. The concrete `expiry_date_notifer` does the work of notifying users of their expired product.
 
@@ -483,6 +486,8 @@ It does not cover the CRUD operations and email sending logic of the system.
 
 
 ### 2 ) Test Score :
+![unit_test_results](https://user-images.githubusercontent.com/69518859/185755560-3326e005-854d-41e2-bcb4-e622c291c4ce.JPG)
+
 There are total 14 unit test codes. All tests are passed. So test passing score is 100%.
 
 ### 3 ) Test it yourself :
